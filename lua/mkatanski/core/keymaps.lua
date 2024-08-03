@@ -20,11 +20,11 @@ keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer
 -- editor navigation
 
 -- Map Ctrl-E as CMD-right to move to the end of the line
-vim.api.nvim_set_keymap("n", "<C-e>", "$", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("i", "<C-e>", "<Esc>A", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "<C-e>", "<Esc>g_", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "[1;9F", "$", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("i", "[1;9F", "<Esc>A", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("v", "[1;9F", "<Esc>g_", { noremap = true, silent = true })
 
 -- Map Ctrl-A as CMD-left to move to the beginning of the line
-vim.api.nvim_set_keymap("n", "<C-a>", "^", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("i", "<C-a>", "<Esc>I", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "<C-a>", "<Esc>^", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "[1;9H", "^", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("i", "[1;9H", "<Esc>I", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("v", "[1;9H", "<Esc>^", { noremap = true, silent = true })
