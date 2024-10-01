@@ -4,6 +4,9 @@ local keymap = vim.keymap
 
 keymap.set("i", "jk", "<ESC>", { desc = "Exit insert mode with 'jk' keys" })
 keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
+keymap.set("n", "<leader>w", "<cmd>wa<CR>", { desc = "Save all files" })
+keymap.set("n", "<leader>W", "<cmd>w<CR>", { desc = "Save file" })
+keymap.set("n", "<leader>qa", "<cmd>conf qa<CR>", { desc = "quit nvim" })
 
 -- window management
 keymap.set("n", "<leader>sv", "<C-w>v", { desc = "Split window vertically" })
