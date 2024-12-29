@@ -1,4 +1,95 @@
 return {
+	"EdenEast/nightfox.nvim",
+	config = function()
+		require("nightfox").setup({
+			options = {
+				-- Compiled file's destination location
+				compile_path = vim.fn.stdpath("cache") .. "/nightfox",
+				compile_file_suffix = "_compiled", -- Compiled file suffix
+				transparent = true, -- Disable setting background
+				terminal_colors = true, -- Set terminal colors (vim.g.terminal_color_*) used in `:terminal`
+				dim_inactive = false, -- Non focused panes set to alternative background
+				module_default = true, -- Default enable value for modules
+				colorblind = {
+					enable = false, -- Enable colorblind support
+					simulate_only = false, -- Only show simulated colorblind colors and not diff shifted
+					severity = {
+						protan = 0, -- Severity [0,1] for protan (red)
+						deutan = 0, -- Severity [0,1] for deutan (green)
+						tritan = 0, -- Severity [0,1] for tritan (blue)
+					},
+				},
+				styles = { -- Style to be applied to different syntax groups
+					comments = "italic", -- Value is any valid attr-list value `:help attr-list`
+					conditionals = "NONE",
+					constants = "NONE",
+					functions = "NONE",
+					keywords = "NONE",
+					numbers = "NONE",
+					operators = "NONE",
+					strings = "NONE",
+					types = "NONE",
+					variables = "NONE",
+				},
+				inverse = { -- Inverse highlight for different types
+					match_paren = false,
+					visual = false,
+					search = false,
+				},
+				modules = { -- List of various plugins and additional options
+					-- ...
+					modes = false,
+				},
+			},
+
+			groups = {
+				all = {
+					-- LineNr = { fg = "#000000" },
+					CursorLine = { bg = "#132F38" },
+					-- CursorLineNr = { fg = "#ffffff" },
+				},
+			},
+		})
+
+		vim.cmd("colorscheme terafox")
+	end,
+}
+--[[ return {
+	"neanias/everforest-nvim",
+	version = false,
+	lazy = false,
+	priority = 1000, -- make sure to load this before all the other start plugins
+	-- Optional; default configuration will be used if setup isn't called.
+	config = function()
+		require("everforest").setup({
+			-- Your config here
+		})
+		vim.cmd("colorscheme everforest")
+	end,
+} ]]
+--[[ return {
+	"comfysage/evergarden",
+	priority = 1000, -- Colorscheme plugin is loaded first before any other plugins
+	opts = {
+		transparent_background = true,
+		contrast_dark = "hard", -- 'hard'|'medium'|'soft'
+		overrides = {}, -- add custom overrides
+	},
+	config = function()
+		vim.cmd("colorscheme evergarden")
+	end,
+} ]]
+--[[ return {
+	"nyoom-engineering/oxocarbon.nvim",
+	config = function()
+		vim.cmd("colorscheme oxocarbon")
+	end,
+	-- Add in any other configuration;
+	--   event = foo,
+	--   config = bar
+	--   end,
+} ]]
+--[[ return {
 	"folke/tokyonight.nvim",
 	priority = 1000,
 	config = function()
@@ -42,4 +133,4 @@ return {
 
 		vim.cmd("colorscheme tokyonight")
 	end,
-}
+} ]]

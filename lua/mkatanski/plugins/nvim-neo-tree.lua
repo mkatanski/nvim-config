@@ -320,7 +320,7 @@ return {
 		-- set keymaps
 		local keymap = vim.keymap -- for conciseness
 
-		keymap.set("n", "<leader>ee", "<cmd>Neotree filesystem toggle float<CR>", { desc = "Toggle floating explorer" }) -- toggle file explorer
+		keymap.set("n", "<leader>ee", "<cmd>Neotree filesystem reveal float<CR>", { desc = "Reveal floating explorer" }) -- toggle file explorer
 		keymap.set("n", "<leader>el", "<cmd>Neotree filesystem toggle left<CR>", { desc = "Toggle left explorer" }) -- toggle file explorer
 		keymap.set("n", "<leader>gs", "<cmd>Neotree git_status<CR>", { desc = "Toggle git status explorer" }) -- toggle file explorer
 	end,
