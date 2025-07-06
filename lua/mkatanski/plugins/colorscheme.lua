@@ -44,9 +44,7 @@ return {
 
 			groups = {
 				all = {
-					-- LineNr = { fg = "#000000" },
 					CursorLine = { bg = "#132F38" },
-					-- CursorLineNr = { fg = "#ffffff" },
 				},
 			},
 		})
