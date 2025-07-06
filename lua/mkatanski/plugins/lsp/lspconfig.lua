@@ -13,14 +13,13 @@ return {
 		-- import mason_lspconfig plugin
 		local mason_lspconfig = require("mason-lspconfig")
 
+		-- Get the list of installed servers
+		local servers = mason_lspconfig.get_installed_servers()
+
 		-- import cmp-nvim-lsp plugin
 		local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
 		local keymap = vim.keymap -- for conciseness
-
-		vim.cmd([[
-      autocmd BufWritePre *.tsx,*.ts,*.jsx,*.js EslintFixAll
-    ]])
 
 		vim.api.nvim_create_autocmd("LspAttach", {
 			group = vim.api.nvim_create_augroup("UserLspConfig", {}),
@@ -82,14 +81,9 @@ return {
 			vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
 		end
 
-		mason_lspconfig.setup_handlers({
-			-- default handler for installed servers
-			function(server_name)
-				lspconfig[server_name].setup({
-					capabilities = capabilities,
-				})
-			end,
-			["svelte"] = function()
+		-- Configure installed servers
+		for _, server_name in ipairs(servers) do
+			if server_name == "svelte" then
 				-- configure svelte server
 				lspconfig["svelte"].setup({
 					capabilities = capabilities,
@@ -103,15 +97,13 @@ return {
 						})
 					end,
 				})
-			end,
-			["graphql"] = function()
+			elseif server_name == "graphql" then
 				-- configure graphql language server
 				lspconfig["graphql"].setup({
 					capabilities = capabilities,
 					filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
 				})
-			end,
-			["emmet_ls"] = function()
+			elseif server_name == "emmet_ls" then
 				-- configure emmet language server
 				lspconfig["emmet_ls"].setup({
 					capabilities = capabilities,
@@ -126,8 +118,7 @@ return {
 						"svelte",
 					},
 				})
-			end,
-			["lua_ls"] = function()
+			elseif server_name == "lua_ls" then
 				-- configure lua server (with special settings)
 				lspconfig["lua_ls"].setup({
 					capabilities = capabilities,
@@ -143,7 +134,23 @@ return {
 						},
 					},
 				})
-			end,
-		})
+			elseif server_name == "eslint" then
+				-- configure eslint server
+				lspconfig["eslint"].setup({
+					capabilities = capabilities,
+					on_attach = function(client, bufnr)
+						vim.api.nvim_create_autocmd("BufWritePre", {
+							buffer = bufnr,
+							command = "EslintFixAll",
+						})
+					end,
+				})
+			else
+				-- default handler for all other servers
+				lspconfig[server_name].setup({
+					capabilities = capabilities,
+				})
+			end
+		end
 	end,
 }
