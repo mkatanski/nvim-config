@@ -24,6 +24,11 @@ return {
 		vim.api.nvim_create_autocmd("LspAttach", {
 			group = vim.api.nvim_create_augroup("UserLspConfig", {}),
 			callback = function(ev)
+				-- Enable inlay hints if supported by the client
+				if vim.lsp.inlay_hint then
+					vim.lsp.inlay_hint.enable(true, { bufnr = ev.buf })
+				end
+
 				-- Buffer local mappings.
 				-- See `:help vim.lsp.*` for documentation on any of the below functions
 				local opts = { buffer = ev.buf, silent = true }
@@ -62,11 +67,25 @@ return {
 				opts.desc = "Go to next diagnostic"
 				keymap.set("n", "]d", vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
 
-				opts.desc = "Show documentation for what is under cursor"
-				keymap.set("n", "gk", vim.lsp.buf.hover, opts) -- show documentation for what is under cursor
+				-- Hover is now handled by hover.nvim plugin with 'K' keybinding
 
 				opts.desc = "Restart LSP"
 				keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary
+
+				-- Toggle inlay hints
+				if vim.lsp.inlay_hint then
+					opts.desc = "Toggle inlay hints"
+					keymap.set("n", "<leader>ih", function()
+						local current_state = vim.lsp.inlay_hint.is_enabled({ bufnr = ev.buf })
+						vim.lsp.inlay_hint.enable(not current_state, { bufnr = ev.buf })
+						-- Show status message
+						if current_state then
+							vim.notify("Inlay hints disabled", vim.log.levels.INFO)
+						else
+							vim.notify("Inlay hints enabled", vim.log.levels.INFO)
+						end
+					end, opts)
+				end
 			end,
 		})
 
@@ -144,6 +163,76 @@ return {
 							command = "EslintFixAll",
 						})
 					end,
+				})
+			elseif server_name == "vtsls" then
+				-- configure vtsls for enhanced TypeScript support
+				lspconfig["vtsls"].setup({
+					capabilities = capabilities,
+					init_options = {
+						preferences = {
+							-- Prevent type truncation in hover tooltips
+							noErrorTruncation = true,
+						},
+					},
+					settings = {
+						complete_function_calls = true,
+						vtsls = {
+							enableMoveToFileCodeAction = true,
+							autoUseWorkspaceTsdk = true,
+							experimental = {
+								maxInlayHintLength = 30,
+								completion = {
+									enableServerSideFuzzyMatch = true,
+								},
+							},
+						},
+						typescript = {
+							updateImportsOnFileMove = { enabled = "always" },
+							suggest = {
+								completeFunctionCalls = true,
+							},
+							preferences = {
+								-- Prevent type truncation in hover tooltips
+								noErrorTruncation = true,
+							},
+							inlayHints = {
+								enumMemberValues = { enabled = true },
+								functionLikeReturnTypes = { enabled = true },
+								parameterNames = { enabled = "all" },
+								parameterTypes = { enabled = true },
+								propertyDeclarationTypes = { enabled = true },
+								variableTypes = { enabled = true },
+								includeInlayParameterNameHints = "all",
+								includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+								includeInlayFunctionParameterTypeHints = true,
+								includeInlayVariableTypeHints = true,
+								includeInlayPropertyDeclarationTypeHints = true,
+								includeInlayFunctionLikeReturnTypeHints = true,
+								includeInlayEnumMemberValueHints = true,
+							},
+						},
+						javascript = {
+							preferences = {
+								-- Prevent type truncation in hover tooltips for JS files too
+								noErrorTruncation = true,
+							},
+							inlayHints = {
+								enumMemberValues = { enabled = true },
+								functionLikeReturnTypes = { enabled = true },
+								parameterNames = { enabled = "all" },
+								parameterTypes = { enabled = true },
+								propertyDeclarationTypes = { enabled = true },
+								variableTypes = { enabled = true },
+								includeInlayParameterNameHints = "all",
+								includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+								includeInlayFunctionParameterTypeHints = true,
+								includeInlayVariableTypeHints = true,
+								includeInlayPropertyDeclarationTypeHints = true,
+								includeInlayFunctionLikeReturnTypeHints = true,
+								includeInlayEnumMemberValueHints = true,
+							},
+						},
+					},
 				})
 			else
 				-- default handler for all other servers
