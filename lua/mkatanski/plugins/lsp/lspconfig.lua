@@ -24,10 +24,8 @@ return {
 		vim.api.nvim_create_autocmd("LspAttach", {
 			group = vim.api.nvim_create_augroup("UserLspConfig", {}),
 			callback = function(ev)
-				-- Enable inlay hints if supported by the client
-				if vim.lsp.inlay_hint then
-					vim.lsp.inlay_hint.enable(true, { bufnr = ev.buf })
-				end
+				-- Inlay hints are disabled by default
+				-- Users can toggle them with <leader>ih
 
 				-- Buffer local mappings.
 				-- See `:help vim.lsp.*` for documentation on any of the below functions

@@ -31,3 +31,7 @@ vim.api.nvim_set_keymap("v", "[1;9F", "<Esc>g_", { noremap = true, silent = true
 vim.api.nvim_set_keymap("n", "[1;9H", "^", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("i", "[1;9H", "<Esc>I", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("v", "[1;9H", "<Esc>^", { noremap = true, silent = true })
+
+-- Half-page scrolling
+keymap.set("n", "<leader>j", "<C-d>", { desc = "Scroll down half page" })
+keymap.set("n", "<leader>k", "<C-u>", { desc = "Scroll up half page" })

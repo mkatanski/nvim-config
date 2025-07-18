@@ -56,7 +56,7 @@ return {
 					set_jumps = true, -- whether to set jumps in the jumplist
 					goto_next_start = {
 						["]f"] = { query = "@call.outer", desc = "Next function call start" },
-						["]m"] = { query = "@function.outer", desc = "Next method/function def start" },
+						-- ["]m"] removed - using custom top-level function navigation
 						["]c"] = { query = "@class.outer", desc = "Next class start" },
 						["]i"] = { query = "@conditional.outer", desc = "Next conditional start" },
 						["]l"] = { query = "@loop.outer", desc = "Next loop start" },
@@ -75,7 +75,7 @@ return {
 					},
 					goto_previous_start = {
 						["[f"] = { query = "@call.outer", desc = "Prev function call start" },
-						["[m"] = { query = "@function.outer", desc = "Prev method/function def start" },
+						-- ["[m"] removed - using custom top-level function navigation
 						["[c"] = { query = "@class.outer", desc = "Prev class start" },
 						["[i"] = { query = "@conditional.outer", desc = "Prev conditional start" },
 						["[l"] = { query = "@loop.outer", desc = "Prev loop start" },
@@ -102,5 +102,159 @@ return {
 		vim.keymap.set({ "n", "x", "o" }, "F", ts_repeat_move.builtin_F)
 		vim.keymap.set({ "n", "x", "o" }, "t", ts_repeat_move.builtin_t)
 		vim.keymap.set({ "n", "x", "o" }, "T", ts_repeat_move.builtin_T)
+
+		-- Custom navigation for top-level functions only
+		local ts_utils = require("nvim-treesitter.ts_utils")
+		local parsers = require("nvim-treesitter.parsers")
+
+		-- Language-specific function node types
+		local function_node_types = {
+			javascript = { "function_declaration", "method_definition", "arrow_function", "function_expression" },
+			typescript = { "function_declaration", "method_definition", "arrow_function", "function_expression" },
+			tsx = { "function_declaration", "method_definition", "arrow_function", "function_expression" },
+			jsx = { "function_declaration", "method_definition", "arrow_function", "function_expression" },
+			python = { "function_definition" },
+			lua = { "function_declaration", "function_definition" },
+			c = { "function_definition" },
+			cpp = { "function_definition" },
+			rust = { "function_item" },
+			go = { "function_declaration", "method_declaration" },
+			java = { "method_declaration" },
+			php = { "function_definition", "method_declaration" },
+			ruby = { "method", "singleton_method" },
+			-- Add more languages as needed
+		}
+
+		local function get_function_query(lang)
+			local types = function_node_types[lang]
+			if not types then
+				-- Fallback to generic function query
+				return "@function.outer"
+			end
+			
+			local query_parts = {}
+			for _, node_type in ipairs(types) do
+				table.insert(query_parts, "(" .. node_type .. ")")
+			end
+			
+			return "[" .. table.concat(query_parts, " ") .. "] @function"
+		end
+
+		local function is_top_level_function(node, lang)
+			if not node then return false end
+			
+			local types = function_node_types[lang] or {}
+			local node_type = node:type()
+			
+			-- Check if this is a function node for this language
+			local is_function = false
+			for _, ftype in ipairs(types) do
+				if node_type == ftype then
+					is_function = true
+					break
+				end
+			end
+			
+			if not is_function then return false end
+			
+			-- Check if any parent is also a function (making this nested)
+			local parent = node:parent()
+			while parent do
+				local parent_type = parent:type()
+				for _, ftype in ipairs(types) do
+					if parent_type == ftype then
+						return false -- This is a nested function
+					end
+				end
+				parent = parent:parent()
+			end
+			
+			return true -- This is a top-level function
+		end
+
+		local function goto_next_top_level_function()
+			local parser = parsers.get_parser()
+			if not parser then return end
+			
+			local lang = parser:lang()
+			local tree = parser:parse()[1]
+			local root = tree:root()
+			
+			local cursor = vim.api.nvim_win_get_cursor(0)
+			local current_row = cursor[1] - 1
+			
+			-- Try to use language-specific query
+			local query_string = get_function_query(lang)
+			local ok, query = pcall(vim.treesitter.query.parse, lang, query_string)
+			
+			if not ok then
+				-- Fallback to using textobjects query
+				require("nvim-treesitter.textobjects.move").goto_next_start("@function.outer")
+				return
+			end
+			
+			local next_row = nil
+			for _, node in query:iter_captures(root, 0) do
+				local start_row = node:start()
+				if start_row > current_row and is_top_level_function(node, lang) then
+					if not next_row or start_row < next_row then
+						next_row = start_row
+					end
+				end
+			end
+			
+			if next_row then
+				vim.api.nvim_win_set_cursor(0, {next_row + 1, 0})
+			end
+		end
+
+		local function goto_prev_top_level_function()
+			local parser = parsers.get_parser()
+			if not parser then return end
+			
+			local lang = parser:lang()
+			local tree = parser:parse()[1]
+			local root = tree:root()
+			
+			local cursor = vim.api.nvim_win_get_cursor(0)
+			local current_row = cursor[1] - 1
+			
+			-- Try to use language-specific query
+			local query_string = get_function_query(lang)
+			local ok, query = pcall(vim.treesitter.query.parse, lang, query_string)
+			
+			if not ok then
+				-- Fallback to using textobjects query
+				require("nvim-treesitter.textobjects.move").goto_previous_start("@function.outer")
+				return
+			end
+			
+			local prev_row = nil
+			for _, node in query:iter_captures(root, 0) do
+				local start_row = node:start()
+				if start_row < current_row and is_top_level_function(node, lang) then
+					if not prev_row or start_row > prev_row then
+						prev_row = start_row
+					end
+				end
+			end
+			
+			if prev_row then
+				vim.api.nvim_win_set_cursor(0, {prev_row + 1, 0})
+			end
+		end
+
+		-- Override ]m and [m to use top-level navigation
+		vim.keymap.set("n", "]m", goto_next_top_level_function, { desc = "Next top-level function" })
+		vim.keymap.set("n", "[m", goto_prev_top_level_function, { desc = "Previous top-level function" })
+		
+		-- Keep ]M and [M for navigating all functions (including nested)
+		vim.keymap.set("n", "]M", function()
+			require("nvim-treesitter.textobjects.move").goto_next_start("@function.outer")
+		end, { desc = "Next function (including nested)" })
+		
+		vim.keymap.set("n", "[M", function()
+			require("nvim-treesitter.textobjects.move").goto_previous_start("@function.outer")
+		end, { desc = "Previous function (including nested)" })
 	end,
 }

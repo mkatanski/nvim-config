@@ -1,57 +1,57 @@
-return {
-	"EdenEast/nightfox.nvim",
-	config = function()
-		require("nightfox").setup({
-			options = {
-				-- Compiled file's destination location
-				compile_path = vim.fn.stdpath("cache") .. "/nightfox",
-				compile_file_suffix = "_compiled", -- Compiled file suffix
-				transparent = true, -- Disable setting background
-				terminal_colors = true, -- Set terminal colors (vim.g.terminal_color_*) used in `:terminal`
-				dim_inactive = false, -- Non focused panes set to alternative background
-				module_default = true, -- Default enable value for modules
-				colorblind = {
-					enable = false, -- Enable colorblind support
-					simulate_only = false, -- Only show simulated colorblind colors and not diff shifted
-					severity = {
-						protan = 0, -- Severity [0,1] for protan (red)
-						deutan = 0, -- Severity [0,1] for deutan (green)
-						tritan = 0, -- Severity [0,1] for tritan (blue)
-					},
-				},
-				styles = { -- Style to be applied to different syntax groups
-					comments = "italic", -- Value is any valid attr-list value `:help attr-list`
-					conditionals = "NONE",
-					constants = "NONE",
-					functions = "NONE",
-					keywords = "NONE",
-					numbers = "NONE",
-					operators = "NONE",
-					strings = "NONE",
-					types = "NONE",
-					variables = "NONE",
-				},
-				inverse = { -- Inverse highlight for different types
-					match_paren = false,
-					visual = false,
-					search = false,
-				},
-				modules = { -- List of various plugins and additional options
-					-- ...
-					modes = false,
-				},
-			},
-
-			groups = {
-				all = {
-					CursorLine = { bg = "#132F38" },
-				},
-			},
-		})
-
-		vim.cmd("colorscheme terafox")
-	end,
-}
+-- return {
+-- 	"EdenEast/nightfox.nvim",
+-- 	config = function()
+-- 		require("nightfox").setup({
+-- 			options = {
+-- 				-- Compiled file's destination location
+-- 				compile_path = vim.fn.stdpath("cache") .. "/nightfox",
+-- 				compile_file_suffix = "_compiled", -- Compiled file suffix
+-- 				transparent = true, -- Disable setting background
+-- 				terminal_colors = true, -- Set terminal colors (vim.g.terminal_color_*) used in `:terminal`
+-- 				dim_inactive = false, -- Non focused panes set to alternative background
+-- 				module_default = true, -- Default enable value for modules
+-- 				colorblind = {
+-- 					enable = false, -- Enable colorblind support
+-- 					simulate_only = false, -- Only show simulated colorblind colors and not diff shifted
+-- 					severity = {
+-- 						protan = 0, -- Severity [0,1] for protan (red)
+-- 						deutan = 0, -- Severity [0,1] for deutan (green)
+-- 						tritan = 0, -- Severity [0,1] for tritan (blue)
+-- 					},
+-- 				},
+-- 				styles = { -- Style to be applied to different syntax groups
+-- 					comments = "italic", -- Value is any valid attr-list value `:help attr-list`
+-- 					conditionals = "NONE",
+-- 					constants = "NONE",
+-- 					functions = "NONE",
+-- 					keywords = "NONE",
+-- 					numbers = "NONE",
+-- 					operators = "NONE",
+-- 					strings = "NONE",
+-- 					types = "NONE",
+-- 					variables = "NONE",
+-- 				},
+-- 				inverse = { -- Inverse highlight for different types
+-- 					match_paren = false,
+-- 					visual = false,
+-- 					search = false,
+-- 				},
+-- 				modules = { -- List of various plugins and additional options
+-- 					-- ...
+-- 					modes = false,
+-- 				},
+-- 			},
+--
+-- 			groups = {
+-- 				all = {
+-- 					CursorLine = { bg = "#132F38" },
+-- 				},
+-- 			},
+-- 		})
+--
+-- 		vim.cmd("colorscheme terafox")
+-- 	end,
+-- }
 --[[ return {
 	"neanias/everforest-nvim",
 	version = false,
@@ -87,7 +87,7 @@ return {
 	--   config = bar
 	--   end,
 } ]]
---[[ return {
+return {
 	"folke/tokyonight.nvim",
 	priority = 1000,
 	config = function()
@@ -105,7 +105,7 @@ return {
 
 		require("tokyonight").setup({
 			style = "night",
-			transparent = transparent,
+			-- transparent = transparent,
 			styles = {
 				sidebars = transparent and "transparent" or "dark",
 				floats = transparent and "transparent" or "dark",
@@ -127,8 +127,71 @@ return {
 				colors.fg_gutter = fg_gutter
 				colors.fg_sidebar = fg_dark
 			end,
+			on_highlights = function(hl, colors)
+				-- Make indent lines much darker
+				hl.IblIndent = {
+					fg = "#1a2a3a", -- Very dark blue-gray
+					nocombine = true,
+				}
+				hl.IblScope = {
+					fg = "#2a3a4a", -- Slightly lighter for active scope
+					nocombine = true,
+				}
+				-- Also set legacy highlight groups for compatibility
+				hl.IndentBlanklineChar = {
+					fg = "#1a2a3a",
+					nocombine = true,
+				}
+				hl.IndentBlanklineContextChar = {
+					fg = "#2a3a4a",
+					nocombine = true,
+				}
+				
+				-- Neo-tree customizations
+				-- Make Neo-tree indent markers darker
+				hl.NeoTreeIndentMarker = {
+					fg = "#1a2a3a", -- Same dark color as indent lines
+					nocombine = true,
+				}
+				
+				-- Modified files/folders in orange
+				hl.NeoTreeModified = {
+					fg = colors.orange, -- Use Tokyonight's orange color
+				}
+				hl.NeoTreeGitModified = {
+					fg = colors.orange,
+				}
+				
+				-- New/untracked files in green
+				hl.NeoTreeGitUntracked = {
+					fg = colors.green, -- Green for new files
+				}
+				hl.NeoTreeGitAdded = {
+					fg = colors.green, -- Green for added files
+				}
+				
+				-- Other git states
+				hl.NeoTreeGitDeleted = {
+					fg = colors.red, -- Red for deleted files
+				}
+				hl.NeoTreeGitRenamed = {
+					fg = colors.purple, -- Purple for renamed files
+				}
+				hl.NeoTreeGitConflict = {
+					fg = colors.red1, -- Bright red for conflicts
+				}
+				
+				-- Make directory icons follow git status colors
+				hl.NeoTreeDirectoryIcon = {
+					fg = colors.blue, -- Default color for folders
+				}
+				hl.NeoTreeRootName = {
+					fg = colors.magenta,
+					bold = true,
+				}
+			end,
 		})
 
 		vim.cmd("colorscheme tokyonight")
 	end,
-} ]]
+}
