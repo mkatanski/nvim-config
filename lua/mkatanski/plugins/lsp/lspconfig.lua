@@ -167,7 +167,23 @@ return {
 				lspconfig["vtsls"].setup({
 					capabilities = capabilities,
 					init_options = {
+						hostInfo = "neovim",
 						preferences = {
+							-- Enhanced TypeScript preferences
+							includeInlayParameterNameHints = "all",
+							includeInlayEnumMemberValueHints = true,
+							includeInlayFunctionLikeReturnTypeHints = true,
+							includeInlayFunctionParameterTypeHints = true,
+							includeInlayPropertyDeclarationTypeHints = true,
+							includeInlayVariableTypeHints = true,
+							includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+
+							-- Import organization
+							includePackageJsonAutoImports = "auto",
+
+							-- Code actions
+							includeAutomaticOptionalChainCompletions = true,
+
 							-- Prevent type truncation in hover tooltips
 							noErrorTruncation = true,
 						},
@@ -184,26 +200,29 @@ return {
 								},
 							},
 						},
+						-- Enhanced workspace configuration
 						typescript = {
 							updateImportsOnFileMove = { enabled = "always" },
 							suggest = {
 								completeFunctionCalls = true,
+								includeAutomaticOptionalChainCompletions = true,
 							},
 							preferences = {
-								-- Prevent type truncation in hover tooltips
 								noErrorTruncation = true,
+								includePackageJsonAutoImports = "auto",
 							},
+							-- Improved inlay hints
 							inlayHints = {
 								enumMemberValues = { enabled = true },
 								functionLikeReturnTypes = { enabled = true },
 								parameterNames = { enabled = "all" },
 								parameterTypes = { enabled = true },
 								propertyDeclarationTypes = { enabled = true },
-								variableTypes = { enabled = true },
+								variableTypes = { enabled = false }, -- Reduce noise
 								includeInlayParameterNameHints = "all",
 								includeInlayParameterNameHintsWhenArgumentMatchesName = false,
 								includeInlayFunctionParameterTypeHints = true,
-								includeInlayVariableTypeHints = true,
+								includeInlayVariableTypeHints = false, -- Less cluttered
 								includeInlayPropertyDeclarationTypeHints = true,
 								includeInlayFunctionLikeReturnTypeHints = true,
 								includeInlayEnumMemberValueHints = true,
@@ -213,6 +232,7 @@ return {
 							preferences = {
 								-- Prevent type truncation in hover tooltips for JS files too
 								noErrorTruncation = true,
+								includePackageJsonAutoImports = "auto",
 							},
 							inlayHints = {
 								enumMemberValues = { enabled = true },
@@ -220,11 +240,11 @@ return {
 								parameterNames = { enabled = "all" },
 								parameterTypes = { enabled = true },
 								propertyDeclarationTypes = { enabled = true },
-								variableTypes = { enabled = true },
+								variableTypes = { enabled = false }, -- Less cluttered
 								includeInlayParameterNameHints = "all",
 								includeInlayParameterNameHintsWhenArgumentMatchesName = false,
 								includeInlayFunctionParameterTypeHints = true,
-								includeInlayVariableTypeHints = true,
+								includeInlayVariableTypeHints = false, -- Less cluttered
 								includeInlayPropertyDeclarationTypeHints = true,
 								includeInlayFunctionLikeReturnTypeHints = true,
 								includeInlayEnumMemberValueHints = true,

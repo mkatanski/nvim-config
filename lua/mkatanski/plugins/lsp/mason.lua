@@ -48,12 +48,25 @@ return {
 
 		mason_tool_installer.setup({
 			ensure_installed = {
+				-- Formatters
 				"prettier", -- prettier formatter
 				"stylua", -- lua formatter
 				"isort", -- python formatter
 				"black", -- python formatter
-				"pylint", -- python linter
+				"biome", -- modern JS/TS formatter (faster than prettier)
+
+				-- Linters
 				"eslint_d", -- js linter
+				"pylint", -- python linter
+
+				-- Language Servers
+				"typescript-language-server", -- backup for vtsls
+				"tailwindcss-language-server", -- Tailwind CSS support
+				"emmet-ls", -- HTML/CSS expansion
+
+				-- Additional Tools
+				"rustywind", -- Tailwind class sorter
+				"markdownlint", -- Markdown linting
 			},
 		})
 	end,

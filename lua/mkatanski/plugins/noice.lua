@@ -15,7 +15,7 @@ return {
 			-- This is a current Neovim limitation.
 			enabled = true, -- enables the Noice messages UI
 			view = "mini", -- default view for messages
-			view_error = "popup", -- view for errors
+			view_error = "notify", -- view for errors (changed from popup to notify)
 			view_warn = "notify", -- view for warnings
 			view_history = "messages", -- view for :messages
 			view_search = "virtualtext", -- view for search count messages. Set to `false` to disable
@@ -69,6 +69,34 @@ return {
 			-- Benefit of using Noice for this is the routing and consistent history view
 			enabled = true,
 			view = "notify",
+		},
+
+		-- Custom routes to ensure all errors go to notifications
+		routes = {
+			{
+				filter = {
+					event = "msg_show",
+					kind = "error",
+				},
+				view = "notify",
+				opts = { level = "error" },
+			},
+			{
+				filter = {
+					event = "msg_show",
+					kind = "echomsg",
+					find = "Error",
+				},
+				view = "notify",
+				opts = { level = "error" },
+			},
+			{
+				filter = {
+					event = "notify",
+					level = "error",
+				},
+				view = "notify",
+			},
 		},
 		lsp = {
 			progress = {

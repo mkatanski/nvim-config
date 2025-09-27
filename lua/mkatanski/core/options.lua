@@ -34,3 +34,11 @@ opt.clipboard:append("unnamedplus")
 -- split windows
 opt.splitright = true
 opt.splitbelow = true
+
+-- performance optimizations
+opt.updatetime = 250  -- Faster CursorHold events
+opt.timeoutlen = 300  -- Faster which-key triggers
+opt.swapfile = false  -- Disable swap files for better performance
+opt.backup = false    -- Disable backup files
+opt.undofile = true   -- Enable persistent undo
+opt.undodir = vim.fn.stdpath("cache") .. "/undo"
