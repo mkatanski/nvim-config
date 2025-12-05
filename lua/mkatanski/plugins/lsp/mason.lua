@@ -28,7 +28,6 @@ return {
 			-- list of servers for mason to install
 			-- https://github.com/williamboman/mason-lspconfig.nvim?tab=readme-ov-file#available-lsp-servers
 			ensure_installed = {
-				"vtsls",
 				"html",
 				"cssls",
 				"tailwindcss",
@@ -40,9 +39,9 @@ return {
 				"pyright",
 				"eslint",
 			},
-			-- Exclude ts_ls from automatic enabling to prevent conflicts with vtsls
+			-- Exclude TypeScript servers from automatic enabling (using typescript-tools.nvim)
 			automatic_enable = {
-				exclude = { "ts_ls", "tsserver" },
+				exclude = { "ts_ls", "tsserver", "vtsls" },
 			},
 		})
 

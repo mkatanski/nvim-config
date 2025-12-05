@@ -42,8 +42,16 @@ return {
 			-- Session lens for better session discovery
 			session_lens = {
 				load_on_setup = true,
-				theme_conf = { border = true },
+				theme_conf = {
+					border = true,
+					layout_config = {
+						width = 0.8,
+						height = 0.6,
+					},
+				},
 				previewer = false,
+				path_display = { "shorten" },
+				prompt_title = "Session Search",
 			},
 
 			-- Auto save session on exit
@@ -58,5 +66,10 @@ return {
 		keymap.set("n", "<leader>ss", "<cmd>SessionSave<CR>", { desc = "Save session for auto session root dir" })
 		keymap.set("n", "<leader>sl", "<cmd>SessionSearch<CR>", { desc = "Search sessions" })
 		keymap.set("n", "<leader>sd", "<cmd>SessionDelete<CR>", { desc = "Delete session" })
+
+		-- Additional telescope-style session search
+		keymap.set("n", "<leader>sp", function()
+			require("auto-session.session-lens").search_session()
+		end, { desc = "Search Sessions (Telescope)" })
 	end,
 }

@@ -13,9 +13,6 @@ return {
 		-- import mason_lspconfig plugin
 		local mason_lspconfig = require("mason-lspconfig")
 
-		-- Get the list of installed servers
-		local servers = mason_lspconfig.get_installed_servers()
-
 		-- import cmp-nvim-lsp plugin
 		local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
@@ -65,7 +62,7 @@ return {
 				opts.desc = "Go to next diagnostic"
 				keymap.set("n", "]d", vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
 
-				-- Hover is now handled by hover.nvim plugin with 'K' keybinding
+				-- Hover is now handled by better-type-hover.lua plugin with 'gk' keybinding
 
 				opts.desc = "Restart LSP"
 				keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary
@@ -98,11 +95,24 @@ return {
 			vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
 		end
 
-		-- Configure installed servers
-		for _, server_name in ipairs(servers) do
+		-- Configure servers after mason-lspconfig setup
+		-- Only configure actual LSP servers, not formatters/linters
+		-- TypeScript is handled by typescript-tools.nvim for better type information
+		local lsp_servers = {
+			"html", "cssls", "tailwindcss", "svelte",
+			"lua_ls", "graphql", "emmet_ls", "prismals", "pyright", "eslint"
+		}
+
+		-- Setup each LSP server with custom configurations
+		for _, server_name in ipairs(lsp_servers) do
+			-- Check if server is actually installed before configuring
+			local server_available = pcall(require, "lspconfig.server_configurations." .. server_name)
+			if not server_available then
+				goto continue
+			end
 			if server_name == "svelte" then
 				-- configure svelte server
-				lspconfig["svelte"].setup({
+				lspconfig[server_name].setup({
 					capabilities = capabilities,
 					on_attach = function(client, bufnr)
 						vim.api.nvim_create_autocmd("BufWritePost", {
@@ -116,13 +126,13 @@ return {
 				})
 			elseif server_name == "graphql" then
 				-- configure graphql language server
-				lspconfig["graphql"].setup({
+				lspconfig[server_name].setup({
 					capabilities = capabilities,
 					filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
 				})
 			elseif server_name == "emmet_ls" then
 				-- configure emmet language server
-				lspconfig["emmet_ls"].setup({
+				lspconfig[server_name].setup({
 					capabilities = capabilities,
 					filetypes = {
 						"html",
@@ -137,7 +147,7 @@ return {
 				})
 			elseif server_name == "lua_ls" then
 				-- configure lua server (with special settings)
-				lspconfig["lua_ls"].setup({
+				lspconfig[server_name].setup({
 					capabilities = capabilities,
 					settings = {
 						Lua = {
@@ -153,7 +163,7 @@ return {
 				})
 			elseif server_name == "eslint" then
 				-- configure eslint server
-				lspconfig["eslint"].setup({
+				lspconfig[server_name].setup({
 					capabilities = capabilities,
 					on_attach = function(client, bufnr)
 						vim.api.nvim_create_autocmd("BufWritePre", {
@@ -162,102 +172,14 @@ return {
 						})
 					end,
 				})
-			elseif server_name == "vtsls" then
-				-- configure vtsls for enhanced TypeScript support
-				lspconfig["vtsls"].setup({
-					capabilities = capabilities,
-					init_options = {
-						hostInfo = "neovim",
-						preferences = {
-							-- Enhanced TypeScript preferences
-							includeInlayParameterNameHints = "all",
-							includeInlayEnumMemberValueHints = true,
-							includeInlayFunctionLikeReturnTypeHints = true,
-							includeInlayFunctionParameterTypeHints = true,
-							includeInlayPropertyDeclarationTypeHints = true,
-							includeInlayVariableTypeHints = true,
-							includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-
-							-- Import organization
-							includePackageJsonAutoImports = "auto",
-
-							-- Code actions
-							includeAutomaticOptionalChainCompletions = true,
-
-							-- Prevent type truncation in hover tooltips
-							noErrorTruncation = true,
-						},
-					},
-					settings = {
-						complete_function_calls = true,
-						vtsls = {
-							enableMoveToFileCodeAction = true,
-							autoUseWorkspaceTsdk = true,
-							experimental = {
-								maxInlayHintLength = 30,
-								completion = {
-									enableServerSideFuzzyMatch = true,
-								},
-							},
-						},
-						-- Enhanced workspace configuration
-						typescript = {
-							updateImportsOnFileMove = { enabled = "always" },
-							suggest = {
-								completeFunctionCalls = true,
-								includeAutomaticOptionalChainCompletions = true,
-							},
-							preferences = {
-								noErrorTruncation = true,
-								includePackageJsonAutoImports = "auto",
-							},
-							-- Improved inlay hints
-							inlayHints = {
-								enumMemberValues = { enabled = true },
-								functionLikeReturnTypes = { enabled = true },
-								parameterNames = { enabled = "all" },
-								parameterTypes = { enabled = true },
-								propertyDeclarationTypes = { enabled = true },
-								variableTypes = { enabled = false }, -- Reduce noise
-								includeInlayParameterNameHints = "all",
-								includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-								includeInlayFunctionParameterTypeHints = true,
-								includeInlayVariableTypeHints = false, -- Less cluttered
-								includeInlayPropertyDeclarationTypeHints = true,
-								includeInlayFunctionLikeReturnTypeHints = true,
-								includeInlayEnumMemberValueHints = true,
-							},
-						},
-						javascript = {
-							preferences = {
-								-- Prevent type truncation in hover tooltips for JS files too
-								noErrorTruncation = true,
-								includePackageJsonAutoImports = "auto",
-							},
-							inlayHints = {
-								enumMemberValues = { enabled = true },
-								functionLikeReturnTypes = { enabled = true },
-								parameterNames = { enabled = "all" },
-								parameterTypes = { enabled = true },
-								propertyDeclarationTypes = { enabled = true },
-								variableTypes = { enabled = false }, -- Less cluttered
-								includeInlayParameterNameHints = "all",
-								includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-								includeInlayFunctionParameterTypeHints = true,
-								includeInlayVariableTypeHints = false, -- Less cluttered
-								includeInlayPropertyDeclarationTypeHints = true,
-								includeInlayFunctionLikeReturnTypeHints = true,
-								includeInlayEnumMemberValueHints = true,
-							},
-						},
-					},
-				})
+			-- TypeScript is now handled by typescript-tools.nvim for better type information
 			else
-				-- default handler for all other servers
+				-- Default handler for all other servers
 				lspconfig[server_name].setup({
 					capabilities = capabilities,
 				})
 			end
+			::continue::
 		end
 	end,
 }

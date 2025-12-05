@@ -1,6 +1,6 @@
 return {
 	"Sebastian-Nielsen/better-type-hover",
-	ft = { "typescript", "typescriptreact" },
+	ft = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
 	dependencies = {
 		"neovim/nvim-lspconfig",
 	},

@@ -40,7 +40,17 @@ return {
 		commands = {
 			last = {
 				view = "popup",
-				opts = { enter = true, format = "details" },
+				opts = {
+					enter = true,
+					format = "details",
+					-- Make popup dismissable with q and Escape
+					win_options = {
+						winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+					},
+					close = {
+						keys = { "q", "<Esc>" },
+					},
+				},
 				filter = {
 					any = {
 						{ event = "notify" },
@@ -56,7 +66,17 @@ return {
 			errors = {
 				-- options for the message history that you get with `:Noice`
 				view = "popup",
-				opts = { enter = true, format = "details" },
+				opts = {
+					enter = true,
+					format = "details",
+					-- Make popup dismissable with q and Escape
+					win_options = {
+						winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+					},
+					close = {
+						keys = { "q", "<Esc>" },
+					},
+				},
 				filter = { error = true },
 				filter_opts = { reverse = true },
 			},
@@ -93,7 +113,7 @@ return {
 			{
 				filter = {
 					event = "notify",
-					level = "error",
+					error = true,
 				},
 				view = "notify",
 			},
@@ -158,6 +178,14 @@ return {
 		},
 		health = {
 			checker = true, -- Disable if you don't want health checks to run
+		},
+		-- Configure views to ensure all popups are dismissable
+		views = {
+			popup = {
+				close = {
+					keys = { "q", "<Esc>" },
+				},
+			},
 		},
 	},
 	dependencies = {
